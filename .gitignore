@@ -4,7 +4,6 @@ dist/
 
 # Ignore dependencies
 node_modules/
-vendor/
 
 # Ignore IDE and editor files
 .idea/
@@ -20,5 +19,7 @@ vendor/
 config.ini
 secrets.txt
 
-RSS-Aggregator
+# Ignore environment files
 .env
+
+RSS-Aggregator
