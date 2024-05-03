@@ -60,6 +60,9 @@ func main() {
 	//get user by apikey route
 	//path: "/v1/get"
 	v1Router.Get("/get", apiCfg.handlerGetUser)
+
+	//get user by name route
+	//path: "/v1/get/name"
 	v1Router.Get("/get/name", apiCfg.handlerGetUserByName)
 
 	//create user route
