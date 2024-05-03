@@ -6,10 +6,12 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Amaan-Khan14/RSS-Aggregator/internal/auth"
 	"github.com/Amaan-Khan14/RSS-Aggregator/internal/database"
 	"github.com/google/uuid"
 )
 
+// To Create user in the database
 func (apiCfg *apiConfig) handlerCreateUsers(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Name string `json:"name"`
@@ -32,5 +34,41 @@ func (apiCfg *apiConfig) handlerCreateUsers(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
+	respondWithJSON(w, 201, databaseUserToUser(user))
+}
+
+// To GetUsers Based on API Key
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
+	apiKey, err := auth.GetApiKey(r.Header)
+	if err != nil {
+		respondWithErr(w, 403, fmt.Sprint("Unauthorized:", err))
+		return
+	}
+	user, err := apiCfg.DB.GetUserByApiKey(r.Context(), apiKey)
+	if err != nil {
+		respondWithErr(w, 400, fmt.Sprint("Could'nt get user:", err))
+		return
+	}
 	respondWithJSON(w, 200, databaseUserToUser(user))
+}
+
+// To GetUsers Based on name
+func (apiCfg *apiConfig) handlerGetUserByName(w http.ResponseWriter, r *http.Request) {
+	type parameters struct {
+		Name string `json:"name"`
+	}
+	decoder := json.NewDecoder(r.Body)
+	params := parameters{}
+	err := decoder.Decode(&params)
+	if err != nil {
+		respondWithErr(w, 400, fmt.Sprintf("Error parsing JSON:", err))
+		return
+	}
+	user, err := apiCfg.DB.GetUserByName(r.Context(), params.Name)
+	if err != nil {
+		respondWithErr(w, 400, fmt.Sprint("Could'nt get user:", err))
+		return
+	}
+
+	respondWithJSON(w, 200, user)
 }

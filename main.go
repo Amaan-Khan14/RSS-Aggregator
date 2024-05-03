@@ -49,16 +49,22 @@ func main() {
 	}))
 
 	v1Router := chi.NewRouter()
-	v1Router.Get("/readiness", handlerReadiness)
+
 	//path: "/v1/readiness"
+	v1Router.Get("/readiness", handlerReadiness)
 
 	//error route
+	//path: "/v1/error"
 	v1Router.Get("/error", hanlErr)
-	//apth: "/v1/error"
+
+	//get user by apikey route
+	//path: "/v1/get"
+	v1Router.Get("/get", apiCfg.handlerGetUser)
+	v1Router.Get("/get/name", apiCfg.handlerGetUserByName)
 
 	//create user route
-	v1Router.Post("/create", apiCfg.handlerCreateUsers)
 	//path: "/v1/create"
+	v1Router.Post("/create", apiCfg.handlerCreateUsers)
 
 	router.Mount("/v1", v1Router)
 
