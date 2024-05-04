@@ -8,5 +8,5 @@ RETURNING *;
 -- name: GetUserByApiKey :one
 SELECT * FROM users WHERE api_key = $1;
 
--- name: GetUserByName :one
+-- name: GetUserByName :many
 SELECT name,id,created_at,updated_at FROM users WHERE name = $1;

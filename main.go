@@ -59,7 +59,7 @@ func main() {
 
 	//get user by apikey route
 	//path: "/v1/get"
-	v1Router.Get("/get", apiCfg.handlerGetUser)
+	v1Router.Get("/get", apiCfg.middlewareAuht(apiCfg.handlerGetUser))
 
 	//get user by name route
 	//path: "/v1/get/name"
@@ -68,6 +68,26 @@ func main() {
 	//create user route
 	//path: "/v1/create"
 	v1Router.Post("/create", apiCfg.handlerCreateUsers)
+
+	//creaet feed route
+	//path: "/v1/create/feed"
+	v1Router.Post("/create/feed", apiCfg.middlewareAuht(apiCfg.handlerCreateFeed))
+
+	//get feed route
+	//path: "/v1/get/feed"
+	v1Router.Get("/get/feed", apiCfg.handlerGetFeeds)
+
+	//feedfollow route
+	//path: "/v1/create/feedfollow"
+	v1Router.Post("/create/feedfollow", apiCfg.middlewareAuht(apiCfg.handlerCreateFeedFollow))
+
+	//get feedfollow route
+	//path: "/v1/get/feedfollow"
+	v1Router.Get("/get/feedfollow", apiCfg.middlewareAuht(apiCfg.getFeedFollows))
+
+	//delete feedfollow route
+	//path: "/v1/delete/feedfollow"
+	v1Router.Delete("/delete/feedfollow/{feedFollowId}", apiCfg.middlewareAuht(apiCfg.deleteFeedFollow))
 
 	router.Mount("/v1", v1Router)
 

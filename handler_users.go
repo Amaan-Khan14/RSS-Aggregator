@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Amaan-Khan14/RSS-Aggregator/internal/auth"
 	"github.com/Amaan-Khan14/RSS-Aggregator/internal/database"
 	"github.com/google/uuid"
 )
@@ -38,17 +37,7 @@ func (apiCfg *apiConfig) handlerCreateUsers(w http.ResponseWriter, r *http.Reque
 }
 
 // To GetUsers Based on API Key
-func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request) {
-	apiKey, err := auth.GetApiKey(r.Header)
-	if err != nil {
-		respondWithErr(w, 403, fmt.Sprint("Unauthorized:", err))
-		return
-	}
-	user, err := apiCfg.DB.GetUserByApiKey(r.Context(), apiKey)
-	if err != nil {
-		respondWithErr(w, 400, fmt.Sprint("Could'nt get user:", err))
-		return
-	}
+func (apiCfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request, user database.User) {
 	respondWithJSON(w, 200, databaseUserToUser(user))
 }
 

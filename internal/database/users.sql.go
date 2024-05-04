@@ -62,7 +62,7 @@ func (q *Queries) GetUserByApiKey(ctx context.Context, apiKey string) (User, err
 	return i, err
 }
 
-const getUserByName = `-- name: GetUserByName :one
+const getUserByName = `-- name: GetUserByName :many
 SELECT name,id,created_at,updated_at FROM users WHERE name = $1
 `
 
@@ -73,14 +73,30 @@ type GetUserByNameRow struct {
 	UpdatedAt time.Time
 }
 
-func (q *Queries) GetUserByName(ctx context.Context, name string) (GetUserByNameRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserByName, name)
-	var i GetUserByNameRow
-	err := row.Scan(
-		&i.Name,
-		&i.ID,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+func (q *Queries) GetUserByName(ctx context.Context, name string) ([]GetUserByNameRow, error) {
+	rows, err := q.db.QueryContext(ctx, getUserByName, name)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUserByNameRow
+	for rows.Next() {
+		var i GetUserByNameRow
+		if err := rows.Scan(
+			&i.Name,
+			&i.ID,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
