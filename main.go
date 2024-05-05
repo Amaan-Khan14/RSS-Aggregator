@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/Amaan-Khan14/RSS-Aggregator/internal/database"
 	"github.com/go-chi/chi"
@@ -14,6 +15,12 @@ import (
 )
 
 func main() {
+
+	// feed, err := urlToFeed("https://wagslane.dev/index.xml")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println(feed)
 
 	godotenv.Load()
 	port := os.Getenv("PORT")
@@ -37,6 +44,8 @@ func main() {
 	apiCfg := apiConfig{
 		DB: database.New(conn),
 	}
+
+	go startScrapping(apiCfg.DB, 10, time.Minute) //go routine
 
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
@@ -88,6 +97,10 @@ func main() {
 	//delete feedfollow route
 	//path: "/v1/delete/feedfollow"
 	v1Router.Delete("/delete/feedfollow/{feedFollowId}", apiCfg.middlewareAuht(apiCfg.deleteFeedFollow))
+
+	//get posts route
+	//path: "/v1/get/posts"
+	v1Router.Get("/get/posts", apiCfg.middlewareAuht(apiCfg.handlerGetPostsForUser))
 
 	router.Mount("/v1", v1Router)
 
